@@ -2,11 +2,14 @@ import pandas as pd
 from datetime import datetime, timedelta
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+raw_data = os.getenv("RAW_DATA_ORIGINAL")
 
 api_url = 'https://www.datos.gov.co/resource/kekd-7v7h.json'
 limit = 50000
-
-raw_data = 'data/raw/calidad_aire.csv'
 
 def get_last_year_date_str():
     """Retorna la fecha de hace un año en el formato YYYY para la API."""
@@ -42,7 +45,7 @@ def extract_air_quality_data():
     # Filtro SoQL para obtener datos del último año para ciudades de interés
     # Puedes modificar o quitar este filtro para obtener más datos
     date_filter = get_last_year_date_str()
-    where_clause = f"a_o > 2015"
+    where_clause = f"a_o > {date_filter-10}"
 
     print(f"Iniciando extracción con el filtro: {where_clause}")
 
@@ -66,7 +69,7 @@ def extract_air_quality_data():
     print(f"Extracción completa. Total de registros: {len(df)}")
 
     os.makedirs(os.path.dirname(raw_data), exist_ok=True)
-    df.to_csv(raw_data, index=False, encoding='utf-8')
+    df.to_csv(raw_data, index=False, encoding='utf_8_sig', sep=';') # Se usa utf_8_sig para asegurar los caracteres especiales en español.
     print(f"Datos guardados exitosamente en: {raw_data}")
 
 if __name__ == "__main__":
